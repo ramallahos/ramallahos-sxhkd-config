@@ -1,0 +1,185 @@
+################ LAUNCH APPLICATIONS #####################
+
+# launch applications
+super + a; {b,d,}
+    {brave,dolphin,}
+
+# Kitty Scratchpad
+super + k
+    tdrop -am -w 60% -h 50% -y 25% -x 20% kitty
+
+# Brave Scratchpad
+super + b
+    tdrop -am -w 60% -h 50% -y 25% -x 20% brave
+
+# screenshot
+Print
+    spectacle -f -n
+
+# screenshot selected region
+shift + Print
+    spectacle -r -n
+
+# Launch Terminal
+super + Return
+    kitty
+
+# Lock Screen
+super + l
+    betterlockscreen -l
+
+############# MULTIMEDIA KEYS ######################
+
+# TouchPad Toggle XF86TouchpadToggle
+XF86TouchpadToggle
+    bash $HOME/.config/.scripts/bspwm/touchpadtoggle.sh
+
+# Launch Calculator XF86Calculator
+XF86Calculator
+    kcalc
+
+# Power Menu XF86PowerOff
+XF86PowerOff
+    bash $HOME/.config/.scripts/powermenu/powermenu.sh
+
+# Brightness controls XF86MonBrightness{Up,Down}
+XF86MonBrightness{Up,Down}
+    brightnessctl set {10%+ ,10%-}
+
+# Volume controls XF86Audio{RaiseVolume,LowerVolume,Mute}
+XF86Audio{RaiseVolume,LowerVolume,Mute}
+    pamixer{ -i 5, -d 5, -t}
+
+################## WINDOW MANAGER #################
+
+# restart bspwm
+super + shift + r
+    bspc wm -r
+
+# quit bspwm
+super + shift + x
+    arcolinux-logout
+
+# reloads sxhkd configuration:
+super + Escape
+    pkill -USR1 -x sxhkd
+
+################## BASIC CONTROLS #################
+
+# Close & Kill window
+super + {c,x}
+    bspc  node -{c,k}
+
+# go to or send to the given desktop
+super + {_,shift + }{1-9,0}
+    bspc {desktop -f, node -d} {1,2,3,4,5,6,7,8,9,0}
+
+# Select window or Send the window to another edge of the screen
+super + {_,shift + }{Left,Down,Up,Right}
+    bspc node -{f,s} {west,south,north,east}
+super + {_,shift + }{h,j,k,l}
+    bspc node -{f,s} {west,south,north,east}
+
+# hide focused window
+super + d
+    bspc node focused -g hidden=on
+
+# unhide hidden windows
+super + u
+    bspc node $(bspc query -N -n .hidden | tail -n1) -g hidden=off
+
+#swap desktops
+super + ctrl + {1-9,0}
+	bspc desktop -s {1,2,3,4,5,6,7,8,9,0} --follow
+
+############### RESIZING ####################
+
+# Expanding windows
+super + ctrl {Left,Right,Up,Down}
+    bspc node -z {left -20 0,right 20 0,top 0 -20,bottom 0 20}
+
+# Shrinking windows
+super + alt + {Left,Right,Up,Down}
+    bspc node -z {left 20 0,right -20 0,top 0 20,bottom 0 -20}
+
+# Increase/decrease window gap on focused desktop
+super + alt + bracket{left,right}
+    bspc config -d focused window_gap $((`bspc config -d focused window_gap` {-,+} 5 ))
+
+# Change desktop padding
+super + {_, shift} + bracketright
+    bspc config -d focused right_padding $((`bspc config -d focused right_padding` {+,-} 20 ))
+
+super + {_, shift} + bracketleft
+    bspc config -d focused left_padding $((`bspc config -d focused left_padding` {+,-} 20 ))
+
+super + ctrl + {_, shift} + bracketleft
+    bspc config -d focused bottom_padding $((`bspc config -d focused bottom_padding` {+,-} 20 ))
+
+super + ctrl + {_, shift} + bracketright
+    bspc config -d focused top_padding $((`bspc config -d focused top_padding` {+,-} 20 ))
+
+########################## MOUSE RESIZING ###############
+
+# mouse bindings Move or resize side, corner window
+super + button{1-3}
+    bspc pointer -g {move,resize_side,resize_corner}
+
+# super & mouse scroll to change Focused desktop window gap
+super + button{4,5}
+    bspc config -d focused window_gap $((`bspc config -d focused window_gap` {-,+} 2 ))
+
+################## PRESELECTION #########################
+
+# preselect the direction
+super + ctrl + alt {Left,Down,Up,Right}
+    bspc node -p {west,south,north,east}
+super + ctrl + {h,j,k,l}
+    bspc node -p {west,south,north,east}
+
+# preselect the ratio
+super + ctrl + p + {1-9}
+    bspc node -o 0.{1-9}
+
+# cancel the preselection for the focused node     #####################
+super + ctrl + space
+    bspc node -p cancel
+
+# Move window into presel position
+super + p {Left,Down,Up,Right}
+    bspc window -w {left.manual,down.manual,up.manual,right.manual}
+
+########################### WINDOW & NODE FLAGS ##########################
+
+# set the window state  { Its size and position are determined by the window tree ; A tiled window that automatically shrinks but doesn’t stretch beyond its floating size ; floating Can be moved/resized freely. Although it doesn’t use any tiling space, it is still part of the window tree ; Fills its monitor rectangle and has no borders. }
+super + space
+    bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+
+# set the node flags { Is marked (useful for deferred actions). A marked node becomes unmarked after being sent on a preselected node ; Ignores the node --close message ; Stays in the focused desktop of its monitor ; Tries to keep the same tiling position/size. }
+super + ctrl + {m,l,s,p}
+    bspc node -g {marked,locked,sticky,private}
+
+################################### FLOATING WINDOWS ######################
+
+# move a floating window
+super + f + {Left,Down,Up,Right}
+    bspc node -v {-20 0,0 20,0 -20,20 0}
+
+#################################### FLIP & MIRROR ##########################
+
+# Mirror and flip leaves of tree
+super + f + {comma,period}
+    bspc desktop -F {horizontal,vertical}
+
+# Rotate leaves of tree
+super + r + {comma,period}
+    bspc desktop -R {90,270}
+
+############### MONITORS #####################
+
+# go to and switch windows between monitors
+super + m + {_,shift +} {comma, period}
+    bspc {monitor --focus,node --to-monitor} {prev,next}
+
+
+
